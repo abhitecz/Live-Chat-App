@@ -1,0 +1,33 @@
+{
+  "users": [
+    {
+      "username": "abhijeet",
+      "password": "123",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Aanya&accessoriesProbability=30"
+    },
+    {
+      "username": "abhi",
+      "password": "123",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Aria"
+    }
+  ],
+  "messages": [
+    {
+      "id": 1791569211309,
+      "from": "abhijeet",
+      "avatar": "https://api.dicebear.com/7.x/bottts/svg?seed=Felix",
+      "to": "abhi",
+      "text": "hello",
+      "isGroup": false,
+      "hideFrom": "",
+      "mediaType": null,
+      "mediaUrl": null,
+      "fileName": null,
+      "time": "11:36 pm"
+    }
+  ],
+  "groups": [
+    "General",
+    "Project-Team"
+  ]
+}
