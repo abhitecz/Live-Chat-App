@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import './App.css';
 
-const socket = io('http://localhost:5000');
+// Automatically uses your online URL on Vercel or localhost when developing locally
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const socket = io(BACKEND_URL);
 
-// Unified default avatar collection
 const ALL_AVATARS = [
   'https://api.dicebear.com/7.x/bottts/svg?seed=Felix',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Aanya&accessoriesProbability=30',
@@ -30,10 +31,7 @@ export default function App() {
   const [text, setText] = useState('');
   const [hideFrom, setHideFrom] = useState('');
 
-  // Media Attachment State
   const [mediaAttachment, setMediaAttachment] = useState(null);
-
-  // Settings State
   const [wallpaper, setWallpaper] = useState(localStorage.getItem('chat_wallpaper') || '');
   const [font, setFont] = useState(localStorage.getItem('chat_font') || 'sans');
   const [showSettings, setShowSettings] = useState(false);
@@ -51,7 +49,7 @@ export default function App() {
   }, [font]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/data')
+    fetch(`${BACKEND_URL}/api/data`)
       .then(r => r.json())
       .then(d => {
         setUsers(d.users || []);
@@ -84,7 +82,7 @@ export default function App() {
     e.preventDefault();
     const endpoint = isRegister ? 'register' : 'login';
     try {
-      const res = await fetch(`http://localhost:5000/api/${endpoint}`, {
+      const res = await fetch(`${BACKEND_URL}/api/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...authForm, avatar })
@@ -99,7 +97,7 @@ export default function App() {
       }
       setUser(data.username);
     } catch {
-      alert('Cannot connect to backend server on port 5000');
+      alert('Cannot connect to backend server');
     }
   };
 
@@ -143,7 +141,6 @@ export default function App() {
     const isVideo = file.type.startsWith('video/');
     const isImage = file.type.startsWith('image/');
     if (!isImage && !isVideo) return alert('Select an image or video file.');
-
     if (file.size > 20 * 1024 * 1024) return alert('File limit is 20MB.');
 
     const reader = new FileReader();
@@ -161,7 +158,7 @@ export default function App() {
     setAvatar(newAvatar);
     localStorage.setItem('chat_avatar', newAvatar);
     if (user) {
-      fetch('http://localhost:5000/api/update-avatar', {
+      fetch(`${BACKEND_URL}/api/update-avatar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: user, avatar: newAvatar })
@@ -236,7 +233,6 @@ export default function App() {
 
   return (
     <div className="app-root">
-      {/* Settings Modal */}
       {showSettings && (
         <div className="modal-backdrop">
           <div className="modal-box">
@@ -248,7 +244,6 @@ export default function App() {
               >✕</button>
             </div>
 
-            {/* Unified Avatar Selection */}
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', fontSize: 12, color: '#9ca3af', marginBottom: 8, fontWeight: 'bold' }}>CHOOSE AVATAR PRESET</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -299,7 +294,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Sidebar */}
       <div className="sidebar">
         <div className="side-header">
           <div
@@ -357,7 +351,6 @@ export default function App() {
         })}
       </div>
 
-      {/* Main Chat Display */}
       <div className="chat-area" style={wallpaper ? { backgroundImage: `url(${wallpaper})` } : {}}>
         <div className="chat-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -400,7 +393,6 @@ export default function App() {
           <div ref={scrollRef} />
         </div>
 
-        {/* Selected Media Preview Bar */}
         {mediaAttachment && (
           <div className="media-preview-strip">
             <span>📎 Attached {mediaAttachment.type}: <strong>{mediaAttachment.name}</strong></span>
@@ -408,7 +400,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Group Hide / Whisper Control */}
         {activeChat.isGroup && (
           <div className="hide-bar">
             <span>🔒 Hide this message from:</span>
@@ -421,7 +412,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Quick Reactions Bar */}
         <div className="emoji-tray">
           {['👍', '❤️', '🔥', '🚀', '🎉', '💡'].map((em) => (
             <span key={em} className="emoji-pill" onClick={() => handleSend(em)}>
